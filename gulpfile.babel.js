@@ -110,7 +110,7 @@ gulp.task('uncss', function() {
 // Viewport sizes http://viewportsizes.com/
 gulp.task('pageres', () => {
   return new Pageres({delay: 2})
-    .src('http://' + pkg.name + '.dev', ['1024x768', 'ipad', 'iphone 5s'])
+    .src('http://' + pkg.name + '.dev', ['1024x768', 'ipad', 'iphone 5s'], {crop: true})
     .dest(path.join(__dirname, 'readme_assets'))
     .run();
 });
