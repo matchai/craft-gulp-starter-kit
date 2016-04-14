@@ -36,10 +36,10 @@ Web Starter Kit strives to give you a high performance starting point out of the
 ## Screenshots
 
 #### Desktop
-![alt tag](readme_assets/craft.dev-1024x768.png)
+![alt tag](readme_assets/craft.dev-1024x768-cropped.png)
 
 #### Ipad
-![alt tag](readme_assets/craft.dev-768x1024.png)
+![alt tag](readme_assets/craft.dev-768x1024-cropped.png)
 
 #### iPhone 5s
-![alt tag](readme_assets/craft.dev-320x568.png)
+![alt tag](readme_assets/craft.dev-320x568-cropped.png)
