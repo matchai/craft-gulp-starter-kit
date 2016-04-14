@@ -111,7 +111,7 @@ gulp.task('uncss', function() {
 gulp.task('pageres', () => {
   return new Pageres({delay: 2})
     .src('http://' + pkg.name + '.dev', ['1024x768', 'ipad', 'iphone 5s'])
-    .dest(path.join(__dirname, 'images'))
+    .dest(path.join(__dirname, 'readme_assets'))
     .run();
 });
 
