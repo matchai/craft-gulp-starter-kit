@@ -4,11 +4,6 @@
 
 'use strict';
 
-// This gulpfile makes use of new JavaScript features.
-// Babel handles this without us having to do anything. It just works.
-// You can read more about the new JavaScript features here:
-// https://babeljs.io/docs/learn-es2015/
-
 import path from 'path';
 import gulp from 'gulp';
 import del from 'del';
@@ -16,7 +11,7 @@ import runSequence from 'run-sequence';
 import browserSync from 'browser-sync';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import {output as pagespeed} from 'psi';
-import Pageres from 'pageres';
+import pageres from 'pageres';
 import pkg from './package.json';
 
 const $ = gulpLoadPlugins();
@@ -79,6 +74,7 @@ gulp.task('styles', () => {
 // `.babelrc` file.
 gulp.task('scripts', () =>
   gulp.src([
+      './node_modules/bootstrap/dist/js/bootstrap.js',
       './resources/scripts/app.js'
       // Other scripts
     ])
@@ -95,6 +91,7 @@ gulp.task('scripts', () =>
     .pipe(gulp.dest('public/scripts'))
 );
 
+// Remove unused css
 gulp.task('uncss', function() {
   return gulp.src('public/styles/app.css')
     .pipe($.uncss({
@@ -109,7 +106,7 @@ gulp.task('uncss', function() {
 
 // Viewport sizes http://viewportsizes.com/
 gulp.task('pageres', () => {
-  return new Pageres({delay: 2})
+  return new pageres({delay: 2})
     .src('http://' + pkg.name + '.dev', ['1024x768', 'ipad', 'iphone 5s'], {crop: true})
     .dest(path.join(__dirname, 'readme_assets'))
     .run();
@@ -120,7 +117,7 @@ gulp.task('html', () => {
   return gulp.src('craft/templates/404.twig')
     .pipe($.useref({searchPath: '{.tmp,app}'}))
 
-    // Minify any HTML
+    // Clean any HTML
     .pipe($.if('*.twig', $.htmlmin({
       removeComments: true,
       collapseBooleanAttributes: true,
@@ -134,6 +131,18 @@ gulp.task('html', () => {
     // Output files
     .pipe($.if('*.twig', $.size({title: 'twig', showFiles: true})))
     .pipe(gulp.dest('dist'));
+});
+
+// Lint twig - Rules https://github.com/yaniswang/HTMLHint/wiki/Rules
+gulp.task('htmlhint', function() {
+  return gulp.src('craft/templates/**/*.twig')
+    .pipe($.htmlhint({
+      'doctype-first': false,
+      'tag-self-close': true,
+      'tagname-lowercase': true,
+      'id-unique': true
+    }))
+    .pipe($.htmlhint.reporter())
 });
 
 // Clean output directory
@@ -151,7 +160,7 @@ gulp.task('serve', [], () => {
     proxy: 'http://' + pkg.name + '.dev'
   });
 
-  gulp.watch(['craft/templates/**/*.twig'], reload);
+  gulp.watch(['craft/templates/**/*.twig'], ['htmlhint', reload]);
   gulp.watch(['resources/styles/**/*.{scss,css}'], ['styles', reload]);
   gulp.watch(['resources/scripts/**/*.js'], ['lint', 'scripts', reload]);
   gulp.watch(['resources/images/**/*'], ['images', reload]);
@@ -161,6 +170,15 @@ gulp.task('serve', [], () => {
 gulp.task('default', ['clean'], cb =>
   runSequence(
     'styles',
+    ['lint', 'scripts', 'images'],
+    cb
+  )
+);
+
+// need to add css source map then wont need dist
+gulp.task('dist', ['clean'], cb =>
+  runSequence(
+    'styles',
     ['lint', 'uncss', 'scripts', 'images'],
     cb
   )
@@ -168,12 +186,8 @@ gulp.task('default', ['clean'], cb =>
 
 // Run PageSpeed Insights
 gulp.task('pagespeed', cb =>
-  // Update the below URL to the public URL of your site
   pagespeed(pkg.domain, {
     strategy: 'mobile'
-    // By default we use the PageSpeed Insights free (no API key) tier.
-    // Use a Google Developer API key if you have one: http://goo.gl/RkN0vE
-    // key: 'YOUR_API_KEY'
   }, cb)
 );
 
