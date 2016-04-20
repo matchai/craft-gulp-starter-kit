@@ -1,49 +1,62 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<html xmlns=http://www.w3.org/1999/xhtml lang=en-US>
 <head>
-	<meta charset="utf-8" />
+	<meta charset=utf-8>
 	<title>{% if title is defined %}{{ title }} - {% endif %}{{ siteName }}</title>
-	<link rel="home" href="{{ siteUrl }}" />
-
-  <link rel="stylesheet" href="/styles/app.css">
-
+	<link rel=home href="{{ siteUrl }}">
+  <link rel=stylesheet href=/styles/app.css>
+  <link rel=apple-touch-icon sizes=57x57 href=/favicon/apple-touch-icon-57x57.png>
+  <link rel=apple-touch-icon sizes=60x60 href=/favicon/apple-touch-icon-60x60.png>
+  <link rel=apple-touch-icon sizes=72x72 href=/favicon/apple-touch-icon-72x72.png>
+  <link rel=apple-touch-icon sizes=76x76 href=/favicon/apple-touch-icon-76x76.png>
+  <link rel=apple-touch-icon sizes=114x114 href=/favicon/apple-touch-icon-114x114.png>
+  <link rel=apple-touch-icon sizes=120x120 href=/favicon/apple-touch-icon-120x120.png>
+  <link rel=apple-touch-icon sizes=144x144 href=/favicon/apple-touch-icon-144x144.png>
+  <link rel=apple-touch-icon sizes=152x152 href=/favicon/apple-touch-icon-152x152.png>
+  <link rel=apple-touch-icon sizes=180x180 href=/favicon/apple-touch-icon-180x180.png>
+  <link rel=icon type=image/png href=/favicon/favicon-32x32.png sizes=32x32>
+  <link rel=icon type=image/png href=/favicon/android-chrome-192x192.png sizes=192x192>
+  <link rel=icon type=image/png href=/favicon/favicon-96x96.png sizes=96x96>
+  <link rel=icon type=image/png href=/favicon/favicon-16x16.png sizes=16x16>
+  <link rel=manifest href=/favicon/manifest.json>
+  <link rel=mask-icon href=/favicon/safari-pinned-tab.svg color=#5bbad5>
+  <link rel="shortcut icon" href=/favicon/favicon.ico>
+  <meta name=msapplication-TileColor content=#da532c>
+  <meta name=msapplication-TileImage content=/favicon/mstile-144x144.png>
+  <meta name=msapplication-config content=/favicon/browserconfig.xml>
+  <meta name=theme-color content=#ffffff>
 </head>
-
 <body>
-  <div class="container">
+  <div class=container>
     <nav class="navbar navbar-light bg-faded">
-      <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navbar-header" aria-controls="navbar-header">
+      <button class="navbar-toggler hidden-sm-up" type=button data-toggle=collapse data-target=#navbar-header aria-controls=navbar-header>
         &#9776;
       </button>
-      <div class="collapse navbar-toggleable-xs" id="navbar-header">
-        <a class="navbar-brand" href="{{ siteUrl }}">{{ siteName }}</a>
+      <div class="collapse navbar-toggleable-xs" id=navbar-header>
+        <a class=navbar-brand href="{{ siteUrl }}">{{ siteName }}</a>
         <ul class="nav navbar-nav">
           <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            <a class=nav-link href=#>Home <span class=sr-only>(current)</span></a>
           </li>
-          <li class="nav-item">
+          <li class=nav-item>
             <a class="nav-link {% if craft.request.firstSegment == 'news' %} active{% endif %}" href="{{ url('news') }}">News</a>
           </li>
         </ul>
         <form class="form-inline pull-xs-right">
-          <input class="form-control" type="text" placeholder="Search">
-          <button class="btn btn-success-outline" type="submit">Search</button>
+          <input class=form-control placeholder=Search>
+          <button class="btn btn-success-outline" type=submit>Search</button>
         </form>
       </div>
-    </nav> <!-- /navbar -->
-
+    </nav> 
     {% block content %}
       <p>If you see me, you haven’t set your <code>{% verbatim %}{% block content %}…{% endblock %}{% endverbatim %}</code> yet.</p>
-      <p>See Twig’s <a href="http://twig.sensiolabs.org/doc/templates.html#template-inheritance">Template Inheritance</a> documentation for an explanation.</p>
+      <p>See Twig’s <a href=http://twig.sensiolabs.org/doc/templates.html#template-inheritance>Template Inheritance</a> documentation for an explanation.</p>
     {% endblock %}
-
-  </div> <!-- /container -->
-
+  </div> 
   {# Bootstrap core JavaScript
   ================================================== #}
   {# Placed at the end of the document so the pages load faster #}
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-  <script src="/scripts/app.min.js"></script>
+  <script src=https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js></script>
+  <script src=/scripts/app.min.js></script>
 
-</body>
-</html>
+

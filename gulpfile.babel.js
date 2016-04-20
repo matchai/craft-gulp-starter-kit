@@ -17,14 +17,6 @@ import pkg from './package.json';
 const $ = gulpLoadPlugins();
 const reload = browserSync.reload;
 
-// Lint scripts
-gulp.task('lint', () =>
-  gulp.src('resources/scripts/**/*.js')
-    .pipe($.eslint())
-    .pipe($.eslint.format())
-    .pipe($.if(!browserSync.active, $.eslint.failOnError()))
-);
-
 // Optimize images
 gulp.task('images', () =>
   gulp.src('resources/images/**/*')
@@ -69,6 +61,14 @@ gulp.task('styles', () => {
     .pipe(gulp.dest('public/styles'));
 });
 
+// Lint scripts
+gulp.task('lint', () =>
+  gulp.src('resources/scripts/**/*.js')
+    .pipe($.eslint())
+    .pipe($.eslint.format())
+    .pipe($.if(!browserSync.active, $.eslint.failOnError()))
+);
+
 // Concatenate and minify JavaScript. Optionally transpiles ES2015 code to ES5.
 // to enable ES2015 support remove the line `"only": "gulpfile.babel.js",` in the
 // `.babelrc` file.
@@ -104,21 +104,13 @@ gulp.task('uncss', function() {
     .pipe(gulp.dest('public/styles/'));
 });
 
-// Viewport sizes http://viewportsizes.com/
-gulp.task('pageres', () => {
-  return new pageres({delay: 2})
-    .src('http://' + pkg.name + '.dev', ['1024x768', 'ipad', 'iphone 5s'], {crop: true})
-    .dest(path.join(__dirname, 'readme_assets'))
-    .run();
-});
-
-// Enforce clean code
+// Enforce clean code https://github.com/RobLoach/docpad-plugin-htmlmin/tree/master/test/src/documents
 gulp.task('html', () => {
-  return gulp.src('craft/templates/404.twig')
-    .pipe($.useref({searchPath: '{.tmp,app}'}))
+  return gulp.src('craft/templates/**/*.twig')
+    .pipe($.useref({searchPath: '{.tmp,craft/templates/}'}))
 
     // Clean any HTML
-    .pipe($.if('*.twig', $.htmlmin({
+    .pipe($.htmlmin({
       removeComments: true,
       collapseBooleanAttributes: true,
       removeAttributeQuotes: true,
@@ -127,10 +119,10 @@ gulp.task('html', () => {
       removeScriptTypeAttributes: true,
       removeStyleLinkTypeAttributes: true,
       removeOptionalTags: true
-    })))
+    }))
     // Output files
-    .pipe($.if('*.twig', $.size({title: 'twig', showFiles: true})))
-    .pipe(gulp.dest('dist'));
+    .pipe($.size({title: 'twig', showFiles: true}))
+    .pipe(gulp.dest('craft/templates'));
 });
 
 // Lint twig - Rules https://github.com/yaniswang/HTMLHint/wiki/Rules
@@ -138,11 +130,19 @@ gulp.task('htmlhint', function() {
   return gulp.src('craft/templates/**/*.twig')
     .pipe($.htmlhint({
       'doctype-first': false,
-      'tag-self-close': true,
+      'tag-self-close': false,
       'tagname-lowercase': true,
       'id-unique': true
     }))
     .pipe($.htmlhint.reporter())
+});
+
+// Viewport sizes http://viewportsizes.com/
+gulp.task('pageres', () => {
+  return new pageres({delay: 2})
+    .src('http://' + pkg.name + '.dev', ['1024x768', 'ipad', 'iphone 5s'], {crop: true})
+    .dest(path.join(__dirname, 'readme_assets'))
+    .run();
 });
 
 // Clean output directory
@@ -153,9 +153,7 @@ gulp.task('serve', [], () => {
   browserSync({
     notify: false,
     // Customize the Browsersync console logging prefix
-    logPrefix: 'Flow Comms',
-    // Allow scroll syncing across breakpoints
-    scrollElementMapping: ['app', '.mdl-layout'],
+    logPrefix: 'Flow',
     //https: true,
     proxy: 'http://' + pkg.name + '.dev'
   });
@@ -191,3 +189,63 @@ gulp.task('pagespeed', cb =>
   }, cb)
 );
 
+var realFavicon = require ('gulp-real-favicon');
+var fs = require('fs');
+
+var FAVICON_DATA_FILE = 'faviconData.json';
+
+gulp.task('generate-favicon', function(done) {
+  realFavicon.generateFavicon({
+    masterPicture: './public/images/logo.png',
+    dest: './public/favicon',
+    iconsPath: '/favicon',
+    design: {
+      ios: {
+        pictureAspect: 'noChange'
+      },
+      desktopBrowser: {},
+      windows: {
+        pictureAspect: 'noChange',
+        backgroundColor: '#da532c',
+        onConflict: 'override'
+      },
+      androidChrome: {
+        pictureAspect: 'noChange',
+        themeColor: '#ffffff',
+        manifest: {
+          name: 'Craft CMS',
+          display: 'browser',
+          orientation: 'notSet',
+          onConflict: 'override',
+          declared: true
+        }
+      },
+      safariPinnedTab: {
+        pictureAspect: 'silhouette',
+        themeColor: '#5bbad5'
+      }
+    },
+    settings: {
+      scalingAlgorithm: 'Mitchell',
+      errorOnImageTooSmall: false
+    },
+    markupFile: FAVICON_DATA_FILE
+  }, function() {
+    done();
+  });
+});
+
+gulp.task('inject-favicon-markups', function() {
+  gulp.src([ './craft/templates/_layout.twig' ])
+    .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))
+    .pipe(gulp.dest('./craft/templates/'));
+});
+
+gulp.task('check-for-favicon-update', function(done) {
+  var currentVersion = JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).version;
+  realFavicon.checkForUpdates(currentVersion, function(err) {
+    if (err) {
+      throw err;
+    }
+  });
+});
